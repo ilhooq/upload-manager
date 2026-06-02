@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>UploaderWidget Demo</title>
+  <link rel="stylesheet" href="/dist/upload-manager.css">
+</head>
+<body>
+  <div id="uploader-demo"></div>
+
+  <script type="module">
+    import { UploaderWidget } from "/dist/uploader-widget.es.js"
+
+    const widget = new UploaderWidget("#uploader-demo", {
+      endpoint: "/example/app.php",
+      listEndpoint: "/example/app.php",
+      deleteEndpoint: "/example/app.php",
+      updateEndpoint: "/example/app.php",
+      fieldName: "file",
+      maxFileSize: 5 * 1024 * 1024,
+      autoProceed: false,
+      multiple: true,
+      showRemoteFiles: true,
+      onReady: ({ state }) => {
+        console.log("Uploader ready", state)
+      },
+      onChange: ({ state }) => {
+        console.log("Uploader changed", state.counts, `${state.progress}%`)
+      },
+      onUploadSuccess: ({ file, serverId }) => {
+        console.log("Upload success", file.name, serverId)
+      },
+      onUploadError: ({ file, error }) => {
+        console.error("Upload error", file?.name, error)
+      },
+      onFileUpdate: ({ id, changes, file }) => {
+        console.log("File update", id, changes, file)
+      },
+      onFileUpdateError: ({ id, changes, error }) => {
+        console.error("File update error", id, changes, error)
+      },
+      onReorder: ({ scope, id, direction, persisted }) => {
+        console.log("Reorder", scope, id, direction, { persisted })
+      },
+      onDeleteSuccess: ({ id, scope }) => {
+        console.log("Delete success", scope, id)
+      },
+      onDeleteError: ({ id, scope, error }) => {
+        console.error("Delete error", scope, id, error)
+      }
+    })
+
+    window.demoUploader = widget
+  </script>
+</body>
+</html>

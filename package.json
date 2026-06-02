@@ -1,0 +1,31 @@
+{
+  "name": "upload-manager",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/uploader-widget.umd.js",
+  "module": "./dist/uploader-widget.es.js",
+  "exports": {
+    ".": {
+      "import": "./dist/uploader-widget.es.js",
+      "require": "./dist/uploader-widget.umd.js"
+    },
+    "./style.css": "./dist/style.css"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "dev": "vite --open ./example/index-dev.html",
+    "build": "vite build",
+    "preview": "vite preview",
+    "backend": "php -S localhost:8081"
+  },
+  "devDependencies": {
+    "@sveltejs/vite-plugin-svelte": "^7.1.2",
+    "@uppy/core": "^5.2.0",
+    "@uppy/xhr-upload": "^5.2.0",
+    "svelte": "^5.0.0",
+    "vite": "^8.0.16"
+  }
+}

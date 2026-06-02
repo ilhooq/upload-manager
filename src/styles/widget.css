@@ -1,0 +1,253 @@
+:root {
+  --bg: #f8f9fa;
+  --panel: #ffffff;
+  --border: #d9dee3;
+  --text: #1e252c;
+  --muted: #6e7a86;
+  --primary: #0d6efd;
+  --success: #198754;
+  --warning: #f0ad4e;
+  --danger: #d9534f;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 24px;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  color: var(--text);
+  background: linear-gradient(180deg, #f3f6f8 0%, #eef2f6 100%);
+}
+
+.uploader {
+  max-width: 1080px;
+  margin: 0 auto;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  box-shadow: 0 8px 20px rgba(31, 36, 42, 0.08);
+  overflow: hidden;
+}
+
+.toolbar {
+  padding: 14px;
+  border-bottom: 1px solid var(--border);
+  background: #f5f7fa;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.btn {
+  border: 1px solid transparent;
+  border-radius: 4px;
+  padding: 8px 12px;
+  font-size: 14px;
+  line-height: 1.2;
+  color: #fff;
+  cursor: pointer;
+}
+
+.btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background: var(--primary);
+  border-color: #0a58ca;
+}
+
+.btn-success {
+  background: var(--success);
+  border-color: #146c43;
+}
+
+.btn-warning {
+  background: var(--warning);
+  border-color: #df8f28;
+}
+
+.btn-danger {
+  background: var(--danger);
+  border-color: #b02a37;
+}
+
+.btn-mini {
+  padding: 6px 10px;
+  font-size: 12px;
+}
+
+.drop-zone {
+  margin: 14px;
+  padding: 26px 14px;
+  border: 2px dashed #94a3b8;
+  border-radius: 4px;
+  text-align: center;
+  color: var(--muted);
+  background: #fcfdff;
+  transition: 160ms ease;
+}
+
+.drop-zone.is-over {
+  border-color: var(--primary);
+  background: #e9f1ff;
+  color: #184f9d;
+}
+
+.global-progress-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 14px 14px;
+}
+
+.global-progress {
+  width: 100%;
+  height: 16px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: #f2f4f6;
+  overflow: hidden;
+}
+
+.global-progress-bar {
+  width: 0;
+  height: 100%;
+  background: linear-gradient(90deg, #0d6efd 0%, #29a5ff 100%);
+  transition: width 140ms linear;
+}
+
+#global-progress-label {
+  min-width: 48px;
+  text-align: right;
+  font-weight: 600;
+}
+
+.table-wrap {
+  overflow-x: auto;
+}
+
+.file-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.file-table th,
+.file-table td {
+  border-top: 1px solid var(--border);
+  padding: 10px;
+  vertical-align: middle;
+}
+
+.file-table th {
+  background: #fafbfc;
+  font-size: 13px;
+  text-align: left;
+  color: #3f4a54;
+}
+
+.name {
+  font-weight: 600;
+  max-width: 340px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.meta {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.thumb {
+  width: 48px;
+  height: 48px;
+  object-fit: cover;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+}
+
+.thumb-placeholder {
+  display: grid;
+  place-items: center;
+  font-size: 10px;
+  color: #667;
+  background: #f3f4f6;
+}
+
+.row-progress {
+  width: 130px;
+  height: 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #f2f4f6;
+  overflow: hidden;
+  margin-bottom: 4px;
+}
+
+.row-progress-bar {
+  height: 100%;
+  background: #0d6efd;
+}
+
+.row-progress-label {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.caption-input {
+  width: 100%;
+  min-width: 180px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 6px 8px;
+  font: inherit;
+  color: var(--text);
+  background: #fff;
+}
+
+.caption-input:focus {
+  outline: 2px solid rgba(13, 110, 253, 0.22);
+  outline-offset: 0;
+  border-color: #0d6efd;
+}
+
+.caption-input.is-saving {
+  opacity: 0.6;
+}
+
+.empty {
+  text-align: center;
+  color: var(--muted);
+  padding: 24px;
+}
+
+@media (max-width: 760px) {
+  body {
+    padding: 12px;
+  }
+
+  .toolbar {
+    padding: 10px;
+  }
+
+  .btn {
+    width: 100%;
+  }
+
+  .file-table {
+    font-size: 13px;
+  }
+
+  .file-table th:nth-child(1),
+  .file-table td:nth-child(1),
+  .file-table th:nth-child(3),
+  .file-table td:nth-child(3) {
+    display: none;
+  }
+}
