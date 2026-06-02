@@ -4974,10 +4974,10 @@ zi([
 	"click",
 	"change",
 	"keydown"
-]), customElements.define("uploader-widget-inner", Va(Ja, { core: {} }, [], []));
+]), customElements.define("upload-manager-inner", Va(Ja, { core: {} }, [], []));
 //#endregion
 //#region src/adapters/widget.js
-var Ya = "uploader-widget-inner";
+var Ya = "upload-manager-inner";
 customElements.get(Ya) || customElements.define(Ya, Ja.element);
 var Xa = class {
 	constructor(e, t = {}) {
@@ -5056,4 +5056,4 @@ window.UploaderWidget = Xa;
 //#endregion
 export { Qe as DEFAULT_LABELS, $e as DEFAULT_OPTIONS, tt as UploaderCore, Xa as UploaderWidget };
 
-//# sourceMappingURL=uploader-widget.es.js.map
+//# sourceMappingURL=upload-manager.es.js.map

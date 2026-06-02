@@ -15,7 +15,7 @@ export default defineConfig({
       entry: resolve(__dirname, "src/index.js"),
       name: "UploaderWidget",
       formats: ["es", "umd"],
-      fileName: (format) => `uploader-widget.${format}.js`
+      fileName: (format) => `upload-manager.${format}.js`
     },
     cssCodeSplit: false,
     sourcemap: true

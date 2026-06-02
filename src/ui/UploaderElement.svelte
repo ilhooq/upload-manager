@@ -1,6 +1,6 @@
 <svelte:options
   customElement={{
-    tag: "uploader-widget-inner",
+    tag: "upload-manager",
     shadow: "none"
   }}
 />

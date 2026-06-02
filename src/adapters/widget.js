@@ -1,7 +1,7 @@
 import { UploaderCore } from "../core/uploader-core.js"
 import UploaderElement from "../ui/UploaderElement.svelte"
 
-const ELEMENT_TAG = "uploader-widget-inner"
+const ELEMENT_TAG = "upload-manager"
 
 if (!customElements.get(ELEMENT_TAG)) {
   customElements.define(ELEMENT_TAG, UploaderElement.element)

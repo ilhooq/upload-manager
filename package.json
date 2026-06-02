@@ -3,12 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "main": "./dist/uploader-widget.umd.js",
-  "module": "./dist/uploader-widget.es.js",
+  "main": "./dist/upload-manager.umd.js",
+  "module": "./dist/upload-manager.es.js",
   "exports": {
     ".": {
-      "import": "./dist/uploader-widget.es.js",
-      "require": "./dist/uploader-widget.umd.js"
+      "import": "./dist/upload-manager.es.js",
+      "require": "./dist/upload-manager.umd.js"
     },
     "./style.css": "./dist/style.css"
   },
