@@ -93,17 +93,17 @@
 
 <main class="uploader">
   <header class="toolbar">
-    <button type="button" class="btn btn-primary" onclick={() => fileInput.click()}>{core.labels.addFiles}</button>
-    <button type="button" class="btn btn-success" onclick={onStart}>{core.labels.startUpload}</button>
-    <button type="button" class="btn btn-warning" onclick={onCancel}>{core.labels.cancel}</button>
-    <button type="button" class="btn btn-danger" onclick={onClearCompleted}>{core.labels.clearCompleted}</button>
+    <button type="button" class="btn btn-primary" onclick={() => fileInput.click()}>{core.t("addFiles")}</button>
+    <button type="button" class="btn btn-success" onclick={onStart}>{core.t("startUpload")}</button>
+    <button type="button" class="btn btn-warning" onclick={onCancel}>{core.t("cancel")}</button>
+    <button type="button" class="btn btn-danger" onclick={onClearCompleted}>{core.t("clearCompleted")}</button>
     <input bind:this={fileInput} type="file" multiple={core.options.multiple} hidden onchange={onBrowseFiles}>
   </header>
 
   <section
     class="drop-zone"
     class:is-over={dropzoneOver}
-    aria-label="Zone de depot"
+    aria-label={core.t("ariaDropzone")}
     ondragover={(event) => {
       event.preventDefault()
       dropzoneOver = true
@@ -113,10 +113,10 @@
     }}
     ondrop={onDrop}
   >
-    {core.labels.dropzone}
+    {core.t("dropzone")}
   </section>
 
-  <section class="global-progress-wrap" aria-label="Progression globale">
+  <section class="global-progress-wrap" aria-label={core.t("ariaGlobalProgress")}>
     <div class="global-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow={state.progress}>
       <div class="global-progress-bar" style={`width: ${state.progress}%`}></div>
     </div>
@@ -127,19 +127,19 @@
     <table class="file-table">
       <thead>
         <tr>
-          <th>Apercu</th>
-          <th>Fichier</th>
-          <th>Taille</th>
-          <th>Legende</th>
-          <th>Statut</th>
-          <th>Progression</th>
-          <th>Actions</th>
+          <th>{core.t("headerPreview")}</th>
+          <th>{core.t("headerFile")}</th>
+          <th>{core.t("headerSize")}</th>
+          <th>{core.t("headerCaption")}</th>
+          <th>{core.t("headerStatus")}</th>
+          <th>{core.t("headerProgress")}</th>
+          <th>{core.t("headerActions")}</th>
         </tr>
       </thead>
       <tbody>
         {#if state.localFiles.length === 0 && state.remoteFiles.length === 0}
           <tr>
-            <td colspan="7" class="empty">{core.labels.empty}</td>
+            <td colspan="7" class="empty">{core.t("empty")}</td>
           </tr>
         {/if}
 
@@ -148,14 +148,14 @@
           <tr>
             <td>
               {#if isImage && file.url}
-                <img class="thumb" src={file.url} alt={`Apercu de ${file.name || "fichier"}`}>
+                <img class="thumb" src={file.url} alt={core.t("previewAlt", { name: file.name || core.t("fallbackFileName") })}>
               {:else}
                 <div class="thumb thumb-placeholder">FILE</div>
               {/if}
             </td>
             <td>
-              <div class="name">{file.name || "fichier"}</div>
-              <div class="meta">{file.type || "type inconnu"}</div>
+              <div class="name">{file.name || core.t("fallbackFileName")}</div>
+              <div class="meta">{file.type || core.t("unknownType")}</div>
             </td>
             <td>{formatBytes(Number(file.size || 0))}</td>
             <td>
@@ -164,7 +164,7 @@
                 class="caption-input"
                 class:is-saving={savingCaptions[String(file.id)]}
                 value={String(file.caption || "")}
-                placeholder={core.labels.captionPlaceholder}
+                placeholder={core.t("captionPlaceholder")}
                 disabled={Boolean(savingCaptions[String(file.id)])}
                 onchange={(event) => onCaptionChange(String(file.id), event.currentTarget.value)}
                 onkeydown={(event) => {
@@ -180,12 +180,12 @@
                 }}
               >
             </td>
-            <td>{core.labels.serverState}</td>
+            <td>{core.t("serverState")}</td>
             <td><span class="row-progress-label">100%</span></td>
             <td>
-              <button type="button" class="btn btn-mini btn-primary" disabled={index === 0} onclick={() => core.moveRemote(String(file.id), "up")}>↑</button>
-              <button type="button" class="btn btn-mini btn-primary" disabled={index === state.remoteFiles.length - 1} onclick={() => core.moveRemote(String(file.id), "down")}>↓</button>
-              <button type="button" class="btn btn-mini btn-danger" onclick={() => onRemoveRemote(String(file.id))}>{core.labels.remove}</button>
+              <button type="button" class="btn btn-mini btn-primary" title={core.t("moveUp")} aria-label={core.t("moveUp")} disabled={index === 0} onclick={() => core.moveRemote(String(file.id), "up")}>↑</button>
+              <button type="button" class="btn btn-mini btn-primary" title={core.t("moveDown")} aria-label={core.t("moveDown")} disabled={index === state.remoteFiles.length - 1} onclick={() => core.moveRemote(String(file.id), "down")}>↓</button>
+              <button type="button" class="btn btn-mini btn-danger" onclick={() => onRemoveRemote(String(file.id))}>{core.t("remove")}</button>
             </td>
           </tr>
         {/each}
@@ -198,14 +198,14 @@
           <tr>
             <td>
               {#if previewUrl}
-                <img class="thumb" src={previewUrl} alt={`Apercu de ${file.name}`}>
+                <img class="thumb" src={previewUrl} alt={core.t("previewAlt", { name: file.name })}>
               {:else}
                 <div class="thumb thumb-placeholder">FILE</div>
               {/if}
             </td>
             <td>
               <div class="name">{file.name}</div>
-              <div class="meta">{file.type || "type inconnu"}</div>
+              <div class="meta">{file.type || core.t("unknownType")}</div>
             </td>
             <td>{formatBytes(file.size)}</td>
             <td><span class="row-progress-label">-</span></td>
@@ -217,9 +217,9 @@
               <span class="row-progress-label">{percent}%</span>
             </td>
             <td>
-              <button type="button" class="btn btn-mini btn-primary" disabled={index === 0} onclick={() => core.moveLocal(file.id, "up")}>↑</button>
-              <button type="button" class="btn btn-mini btn-primary" disabled={index === state.localFiles.length - 1} onclick={() => core.moveLocal(file.id, "down")}>↓</button>
-              <button type="button" class="btn btn-mini btn-danger" onclick={() => onRemoveLocal(file.id)}>{core.labels.remove}</button>
+              <button type="button" class="btn btn-mini btn-primary" title={core.t("moveUp")} aria-label={core.t("moveUp")} disabled={index === 0} onclick={() => core.moveLocal(file.id, "up")}>↑</button>
+              <button type="button" class="btn btn-mini btn-primary" title={core.t("moveDown")} aria-label={core.t("moveDown")} disabled={index === state.localFiles.length - 1} onclick={() => core.moveLocal(file.id, "down")}>↓</button>
+              <button type="button" class="btn btn-mini btn-danger" onclick={() => onRemoveLocal(file.id)}>{core.t("remove")}</button>
             </td>
           </tr>
         {/each}

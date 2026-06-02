@@ -22,6 +22,9 @@
       autoProceed: false,
       multiple: true,
       showRemoteFiles: true,
+      // Locale : "en" (defaut) ou "fr". On peut aussi passer un pack maison
+      // { strings, pluralize }, et surcharger des cles ponctuelles via `labels`.
+      locale: "fr",
       onReady: ({ state }) => {
         console.log("Uploader ready", state)
       },

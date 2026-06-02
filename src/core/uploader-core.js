@@ -1,24 +1,10 @@
 import Uppy from '@uppy/core';
 import XHR from '@uppy/xhr-upload';
+import { locales, DEFAULT_LOCALE } from "../locales/index.js"
 
-export const DEFAULT_LABELS = {
-  addFiles: "Ajouter des fichiers",
-  startUpload: "Demarrer l'upload",
-  cancel: "Annuler",
-  clearCompleted: "Supprimer les termines",
-  dropzone: 'Glissez-deposez vos fichiers ici ou utilisez "Ajouter des fichiers".',
-  empty: "Aucun fichier ajoute",
-  serverState: "Deja sur serveur",
-  caption: "Legende",
-  captionPlaceholder: "Ajouter une legende",
-  statusDone: "Termine",
-  statusError: "Erreur",
-  statusUploading: "Upload en cours",
-  statusWaiting: "En attente",
-  moveUp: "Monter",
-  moveDown: "Descendre",
-  remove: "Supprimer"
-}
+// Kept for backward compatibility: the default locale's label set.
+// The source of truth is now the locale packs (src/locales/).
+export const DEFAULT_LABELS = locales[DEFAULT_LOCALE].strings
 
 export const DEFAULT_OPTIONS = {
   endpoint: "./app.php",
@@ -32,7 +18,20 @@ export const DEFAULT_OPTIONS = {
   multiple: true,
   showRemoteFiles: true,
   persistOrder: true,
+  locale: DEFAULT_LOCALE,
   labels: {}
+}
+
+// Resolves the `locale` option into a full { strings, pluralize } pack.
+// Accepts a known key ("fr", "en"), a custom pack, or a partial pack.
+// `labels` (backward compatibility) then override individual strings.
+export const resolveLocale = (locale, labels = {}) => {
+  const base = locales[DEFAULT_LOCALE]
+  const pack = typeof locale === "string" ? (locales[locale] || base) : (locale || base)
+  return {
+    strings: { ...base.strings, ...pack.strings, ...labels },
+    pluralize: pack.pluralize || base.pluralize
+  }
 }
 
 export const formatBytes = (bytes) => {
@@ -51,7 +50,11 @@ export class UploaderCore {
     }
     this.options.updateEndpoint = options.updateEndpoint ?? options.orderEndpoint ?? "./app.php"
 
-    this.labels = { ...DEFAULT_LABELS, ...this.options.labels }
+    const locale = resolveLocale(this.options.locale, this.options.labels)
+    this.strings = locale.strings
+    this.pluralize = locale.pluralize
+    // Backward-compatible alias: existing code reading `core.labels.x` keeps working.
+    this.labels = this.strings
     this.remoteFiles = []
     this.localOrder = []
     this.remoteOrder = []
@@ -184,11 +187,27 @@ export class UploaderCore {
     }
   }
 
+  // Translates a key, with %{var} interpolation and optional pluralization.
+  // For plural strings (objects keyed by pluralize(count)), pass `count` in vars.
+  t(key, vars = {}) {
+    let value = this.strings[key]
+    if (value == null) return key
+
+    if (typeof value === "object") {
+      const index = this.pluralize(Number(vars.count ?? 0))
+      value = value[index] ?? value[0] ?? ""
+    }
+
+    return String(value).replace(/%\{(\w+)\}/g, (match, name) => (
+      name in vars ? String(vars[name]) : match
+    ))
+  }
+
   computeFileStatus(file) {
-    if (file.progress?.uploadComplete) return this.labels.statusDone
-    if (file.error) return this.labels.statusError
-    if (file.progress?.uploadStarted) return this.labels.statusUploading
-    return this.labels.statusWaiting
+    if (file.progress?.uploadComplete) return this.t("statusDone")
+    if (file.error) return this.t("statusError")
+    if (file.progress?.uploadStarted) return this.t("statusUploading")
+    return this.t("statusWaiting")
   }
 
   getPreviewUrl(file) {
