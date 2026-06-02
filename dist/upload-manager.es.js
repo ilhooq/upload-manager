@@ -4974,10 +4974,10 @@ zi([
 	"click",
 	"change",
 	"keydown"
-]), customElements.define("upload-manager-inner", Va(Ja, { core: {} }, [], []));
+]), customElements.define("upload-manager", Va(Ja, { core: {} }, [], []));
 //#endregion
 //#region src/adapters/widget.js
-var Ya = "upload-manager-inner";
+var Ya = "upload-manager";
 customElements.get(Ya) || customElements.define(Ya, Ja.element);
 var Xa = class {
 	constructor(e, t = {}) {
