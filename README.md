@@ -21,7 +21,13 @@ It provides drag-and-drop uploads, a file table with previews and progress bars,
 
 ## Installation
 
-The library depends on `@uppy/core` and `@uppy/xhr-upload` and is built with Vite.
+Install from npm:
+
+```bash
+npm install @ilhooq/upload-manager
+```
+
+For local development in this repository:
 
 ```bash
 npm install
@@ -39,8 +45,8 @@ The build outputs:
 `package.json` exposes these through the `exports` map, so consumers can do:
 
 ```js
-import { UploaderWidget } from "upload-manager"
-import "upload-manager/style.css"
+import { UploaderWidget } from "@ilhooq/upload-manager"
+import "@ilhooq/upload-manager/style.css"
 ```
 
 ## Quick start
@@ -99,7 +105,7 @@ import {
   formatBytes,              // (bytes) => human-readable string
   locales, DEFAULT_LOCALE,  // locale registry + default key ("en")
   fr, en                    // individual locale packs
-} from "upload-manager"
+} from "@ilhooq/upload-manager"
 ```
 
 `UploaderWidget` is also assigned to `window.UploaderWidget` for non-module usage.

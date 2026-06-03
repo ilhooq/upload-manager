@@ -1,5 +1,5 @@
 {
-  "name": "upload-manager",
+  "name": "@ilhooq/upload-manager",
   "version": "0.1.0",
   "description": "A lightweight, framework-agnostic file upload manager widget built with Svelte 5 and Uppy.",
   "repository": {
