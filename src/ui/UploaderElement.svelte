@@ -161,10 +161,11 @@
 
         {#each state.remoteFiles as file, index (String(file.id))}
           {@const isImage = typeof file.type === "string" && file.type.startsWith("image/")}
+          {@const thumbUrl = file.thumbUrl || (isImage ? file.url : null)}
           <tr>
             <td>
-              {#if isImage && file.url}
-                <img class="thumb" src={file.url} alt={core.t("previewAlt", { name: file.name || core.t("fallbackFileName") })}>
+              {#if thumbUrl}
+                <img class="thumb" src={thumbUrl} alt={core.t("previewAlt", { name: file.name || core.t("fallbackFileName") })}>
               {:else}
                 <div class="thumb thumb-placeholder">FILE</div>
               {/if}
