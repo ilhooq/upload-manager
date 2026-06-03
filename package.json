@@ -1,7 +1,11 @@
 {
   "name": "upload-manager",
   "version": "0.1.0",
-  "private": true,
+  "description": "A lightweight, framework-agnostic file upload manager widget built with Svelte 5 and Uppy.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ilhooq/upload-manager.git"
+  },
   "type": "module",
   "main": "./dist/upload-manager.umd.js",
   "module": "./dist/upload-manager.es.js",
@@ -10,7 +14,7 @@
       "import": "./dist/upload-manager.es.js",
       "require": "./dist/upload-manager.umd.js"
     },
-    "./style.css": "./dist/style.css"
+    "./style.css": "./dist/upload-manager.css"
   },
   "files": [
     "dist"
