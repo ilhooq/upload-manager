@@ -17,7 +17,8 @@
     "./style.css": "./dist/upload-manager.css"
   },
   "files": [
-    "dist"
+    "dist/*.js",
+    "dist/*.css"
   ],
   "scripts": {
     "dev": "vite --open ./example/index-dev.html",
