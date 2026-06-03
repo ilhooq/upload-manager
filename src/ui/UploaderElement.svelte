@@ -87,6 +87,27 @@
   }
 </script>
 
+{#snippet iconUp()}
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+    <polyline points="18 15 12 9 6 15"></polyline>
+  </svg>
+{/snippet}
+
+{#snippet iconDown()}
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+    <polyline points="6 9 12 15 18 9"></polyline>
+  </svg>
+{/snippet}
+
+{#snippet iconRemove()}
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+    <polyline points="3 6 5 6 21 6"></polyline>
+    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+    <line x1="10" y1="11" x2="10" y2="17"></line>
+    <line x1="14" y1="11" x2="14" y2="17"></line>
+  </svg>
+{/snippet}
+
 <main class="uploader">
   <header class="toolbar">
     <button type="button" class="btn btn-primary" onclick={() => fileInput.click()}>{core.t("addFiles")}</button>
@@ -149,7 +170,7 @@
               {/if}
             </td>
             <td>
-              <div class="name">{file.name || core.t("fallbackFileName")}</div>
+              <a class="name" href={file.url} target="_blank" rel="noopener" title={file.name || core.t("fallbackFileName")}>{file.name || core.t("fallbackFileName")}</a>
               <div class="meta">{file.type || core.t("unknownType")}</div>
             </td>
             <td>{formatBytes(Number(file.size || 0))}</td>
@@ -178,9 +199,9 @@
             <td>{core.t("serverState")}</td>
             <td><span class="row-progress-label">100%</span></td>
             <td>
-              <button type="button" class="btn btn-mini btn-primary" title={core.t("moveUp")} aria-label={core.t("moveUp")} disabled={index === 0} onclick={() => core.moveRemote(String(file.id), "up")}>↑</button>
-              <button type="button" class="btn btn-mini btn-primary" title={core.t("moveDown")} aria-label={core.t("moveDown")} disabled={index === state.remoteFiles.length - 1} onclick={() => core.moveRemote(String(file.id), "down")}>↓</button>
-              <button type="button" class="btn btn-mini btn-danger" onclick={() => onRemoveRemote(String(file.id))}>{core.t("remove")}</button>
+              <button type="button" class="btn btn-mini btn-primary" title={core.t("moveUp")} aria-label={core.t("moveUp")} disabled={index === 0} onclick={() => core.moveRemote(String(file.id), "up")}>{@render iconUp()}</button>
+              <button type="button" class="btn btn-mini btn-primary" title={core.t("moveDown")} aria-label={core.t("moveDown")} disabled={index === state.remoteFiles.length - 1} onclick={() => core.moveRemote(String(file.id), "down")}>{@render iconDown()}</button>
+              <button type="button" class="btn btn-mini btn-danger" title={core.t("remove")} aria-label={core.t("remove")} onclick={() => onRemoveRemote(String(file.id))}>{@render iconRemove()}</button>
             </td>
           </tr>
         {/each}
@@ -199,7 +220,7 @@
               {/if}
             </td>
             <td>
-              <div class="name">{file.name}</div>
+              <div class="name" title={file.name}>{file.name}</div>
               <div class="meta">{file.type || core.t("unknownType")}</div>
             </td>
             <td>{formatBytes(file.size)}</td>
@@ -212,9 +233,9 @@
               <span class="row-progress-label">{percent}%</span>
             </td>
             <td>
-              <button type="button" class="btn btn-mini btn-primary" title={core.t("moveUp")} aria-label={core.t("moveUp")} disabled={index === 0} onclick={() => core.moveLocal(file.id, "up")}>↑</button>
-              <button type="button" class="btn btn-mini btn-primary" title={core.t("moveDown")} aria-label={core.t("moveDown")} disabled={index === state.localFiles.length - 1} onclick={() => core.moveLocal(file.id, "down")}>↓</button>
-              <button type="button" class="btn btn-mini btn-danger" onclick={() => onRemoveLocal(file.id)}>{core.t("remove")}</button>
+              <button type="button" class="btn btn-mini btn-primary" title={core.t("moveUp")} aria-label={core.t("moveUp")} disabled={index === 0} onclick={() => core.moveLocal(file.id, "up")}>{@render iconUp()}</button>
+              <button type="button" class="btn btn-mini btn-primary" title={core.t("moveDown")} aria-label={core.t("moveDown")} disabled={index === state.localFiles.length - 1} onclick={() => core.moveLocal(file.id, "down")}>{@render iconDown()}</button>
+              <button type="button" class="btn btn-mini btn-danger" title={core.t("remove")} aria-label={core.t("remove")} onclick={() => onRemoveLocal(file.id)}>{@render iconRemove()}</button>
             </td>
           </tr>
         {/each}

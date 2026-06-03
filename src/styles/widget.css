@@ -77,8 +77,16 @@ body {
 }
 
 .btn-mini {
-  padding: 6px 10px;
+  padding: 6px 8px;
   font-size: 12px;
+}
+
+/* Boutons d'action en icone seule : centre le SVG et le dimensionne
+   via currentColor pour suivre la couleur du bouton. */
+.btn-mini svg {
+  display: block;
+  width: 15px;
+  height: 15px;
 }
 
 .drop-zone {
@@ -151,12 +159,43 @@ body {
   color: #3f4a54;
 }
 
+/* Fixe la largeur de la colonne "Progression" pour eviter le decalage
+   de mise en page quand la barre de progression apparait. */
+.file-table th:nth-child(6),
+.file-table td:nth-child(6) {
+  width: 150px;
+}
+
+/* Empeche les boutons de la colonne "Actions" de passer a la ligne. */
+.file-table td:nth-child(7) {
+  white-space: nowrap;
+}
+
+/* Garde les colonnes "Taille" et "Statut" sur une seule ligne. */
+.file-table th:nth-child(3),
+.file-table td:nth-child(3),
+.file-table th:nth-child(5),
+.file-table td:nth-child(5) {
+  white-space: nowrap;
+}
+
 .name {
+  display: block;
   font-weight: 600;
   max-width: 340px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+a.name {
+  color: inherit;
+  text-decoration: none;
+}
+
+a.name:hover,
+a.name:focus-visible {
+  text-decoration: underline;
 }
 
 .meta {
