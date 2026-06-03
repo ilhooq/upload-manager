@@ -2230,8 +2230,8 @@ var Ye = {
 	}
 	bindUppyEvents() {
 		this.uppy.on("upload-progress", () => this.notify()), this.uppy.on("upload-success", (e, t) => {
-			let n = t?.body?.id || t?.body?.file?.id;
-			n && (this.uppy.setFileMeta(e.id, { serverId: n }), this.remoteFiles = this.remoteFiles.filter((e) => String(e.id) !== String(n))), this.emit("uploadSuccess", {
+			let n = t?.body?.id || t?.body?.file?.id, r = t?.body?.file;
+			n && (this.uppy.setFileMeta(e.id, { serverId: n }), this.remoteFiles = this.remoteFiles.filter((e) => String(e.id) !== String(n))), this.options.showRemoteFiles && r && (this.remoteFiles = [...this.remoteFiles, r], this.syncRemoteOrder(), this.revokePreview(e.id), this.uppy.removeFile(e.id)), this.emit("uploadSuccess", {
 				file: e,
 				response: t,
 				serverId: n,

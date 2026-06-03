@@ -134,9 +134,21 @@ export class UploaderCore {
 
     this.uppy.on("upload-success", (file, response) => {
       const serverId = response?.body?.id || response?.body?.file?.id
+      const remoteFile = response?.body?.file
       if (serverId) {
         this.uppy.setFileMeta(file.id, { serverId })
         this.remoteFiles = this.remoteFiles.filter((item) => String(item.id) !== String(serverId))
+      }
+
+      // Promote the freshly uploaded file into the remote list so it renders
+      // exactly like files already on the server (thumbnail, caption, server
+      // state) instead of lingering in the local list with a "done" status.
+      const promote = this.options.showRemoteFiles && remoteFile
+      if (promote) {
+        this.remoteFiles = [...this.remoteFiles, remoteFile]
+        this.syncRemoteOrder()
+        this.revokePreview(file.id)
+        this.uppy.removeFile(file.id)
       }
 
       this.emit("uploadSuccess", {
