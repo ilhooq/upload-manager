@@ -197,12 +197,12 @@ function T() {
 }
 //#endregion
 //#region node_modules/@uppy/utils/lib/isNetworkError.js
-function ne(e) {
+function E(e) {
 	return e ? e.readyState === 4 && e.status === 0 : !1;
 }
 //#endregion
 //#region node_modules/@uppy/utils/lib/TaskQueue.js
-var re = class {
+var ne = class {
 	#e = [];
 	#t = 0;
 	#n;
@@ -299,7 +299,7 @@ var re = class {
 };
 //#endregion
 //#region node_modules/@uppy/utils/lib/Translator.js
-function E(e, t, n) {
+function re(e, t, n) {
 	let r = [];
 	return e.forEach((e) => typeof e == "string" ? t[Symbol.split](e).forEach((e, t, i) => {
 		e !== "" && r.push(e), t < i.length - 1 && r.push(n);
@@ -310,7 +310,7 @@ function ie(e, t) {
 	if (t == null) return r;
 	for (let e of Object.keys(t)) if (e !== "_") {
 		let i = t[e];
-		typeof i == "string" && (i = n[Symbol.replace](i, "$$$$")), r = E(r, RegExp(`%\\{${e}\\}`, "g"), i);
+		typeof i == "string" && (i = n[Symbol.replace](i, "$$$$")), r = re(r, RegExp(`%\\{${e}\\}`, "g"), i);
 	}
 	return r;
 }
@@ -1877,7 +1877,7 @@ var He = /* @__PURE__ */ c(Pe(), 1), Ue = /* @__PURE__ */ c(Fe(), 1), We = {
 //#region node_modules/@uppy/xhr-upload/lib/index.js
 function Je(e, t) {
 	let n = t;
-	return n ||= /* @__PURE__ */ Error("Upload error"), typeof n == "string" && (n = Error(n)), n instanceof Error || (n = Object.assign(/* @__PURE__ */ Error("Upload error"), { data: n })), ne(e) ? (n = new l(n, e), n) : (n.request = e, n);
+	return n ||= /* @__PURE__ */ Error("Upload error"), typeof n == "string" && (n = Error(n)), n instanceof Error || (n = Object.assign(/* @__PURE__ */ Error("Upload error"), { data: n })), E(e) ? (n = new l(n, e), n) : (n.request = e, n);
 }
 function Ye(e) {
 	return e.data.slice(0, e.data.size, e.meta.type);
@@ -1903,7 +1903,7 @@ var Xe = {
 			...Xe,
 			fieldName: t.bundle ? "files[]" : "file",
 			...t
-		}), this.type = "uploader", this.id = this.opts.id || "XHRUpload", this.defaultLocale = qe, this.i18nInit(), this.#t = new re({ concurrency: this.opts.limit }), this.opts.bundle && !this.opts.formData) throw Error("`opts.formData` must be true when `opts.bundle` is enabled.");
+		}), this.type = "uploader", this.id = this.opts.id || "XHRUpload", this.defaultLocale = qe, this.i18nInit(), this.#t = new ne({ concurrency: this.opts.limit }), this.opts.bundle && !this.opts.formData) throw Error("`opts.formData` must be true when `opts.bundle` is enabled.");
 		if (this.opts.bundle && typeof this.opts.headers == "function") throw Error("`opts.headers` can not be a function when the `bundle: true` option is set.");
 		if (t?.allowedMetaFields === void 0 && "metaFields" in this.opts) throw Error("The `metaFields` option has been renamed to `allowedMetaFields`.");
 		this.uploaderEvents = Object.create(null), this.#e = (e) => async (t, n) => {
@@ -2090,7 +2090,6 @@ var Xe = {
 		addFiles: "Ajouter des fichiers",
 		startUpload: "Démarrer l'upload",
 		cancel: "Annuler",
-		clearCompleted: "Supprimer les terminés",
 		dropzone: "Glissez-déposez vos fichiers ici ou utilisez « Ajouter des fichiers ».",
 		ariaDropzone: "Zone de dépôt",
 		ariaGlobalProgress: "Progression globale",
@@ -2121,7 +2120,6 @@ var Xe = {
 		addFiles: "Add files",
 		startUpload: "Start upload",
 		cancel: "Cancel",
-		clearCompleted: "Clear completed",
 		dropzone: "Drag and drop your files here or use \"Add files\".",
 		ariaDropzone: "Drop zone",
 		ariaGlobalProgress: "Overall progress",
@@ -2305,38 +2303,6 @@ var Xe = {
 	}
 	cancelAll() {
 		this.uppy.cancelAll(), this.notify();
-	}
-	async clearCompleted() {
-		for (let e of this.uppy.getFiles()) {
-			if (e.progress?.uploadComplete) {
-				try {
-					await this.deleteRemoteFile(e), this.emit("deleteSuccess", {
-						id: e.meta?.serverId || e.response?.body?.id || e.response?.body?.file?.id || e.id,
-						scope: "remote",
-						state: this.getState()
-					});
-				} catch (t) {
-					this.emit("deleteError", {
-						id: e.id,
-						scope: "remote",
-						error: t,
-						state: this.getState()
-					});
-				}
-				this.revokePreview(e.id), this.uppy.removeFile(e.id), this.emit("deleteSuccess", {
-					id: e.id,
-					scope: "local",
-					state: this.getState()
-				});
-				continue;
-			}
-			e.error && (this.revokePreview(e.id), this.uppy.removeFile(e.id), this.emit("deleteSuccess", {
-				id: e.id,
-				scope: "local",
-				state: this.getState()
-			}));
-		}
-		this.notify();
 	}
 	moveLocal(e, t) {
 		this.moveInOrder(this.localOrder, e, t), this.emit("reorder", {
@@ -4866,7 +4832,7 @@ function Ka(e, t, n, r, i, a) {
 }
 //#endregion
 //#region src/ui/UploaderElement.svelte
-var qa = /* @__PURE__ */ Qi("<tr><td colspan=\"7\" class=\"empty\"> </td></tr>"), Ja = /* @__PURE__ */ Qi("<img class=\"thumb\"/>"), Ya = /* @__PURE__ */ Qi("<div class=\"thumb thumb-placeholder\">FILE</div>"), Xa = /* @__PURE__ */ Qi("<tr><td><!></td><td><div class=\"name\"> </div> <div class=\"meta\"> </div></td><td> </td><td><input type=\"text\"/></td><td> </td><td><span class=\"row-progress-label\">100%</span></td><td><button type=\"button\" class=\"btn btn-mini btn-primary\">↑</button> <button type=\"button\" class=\"btn btn-mini btn-primary\">↓</button> <button type=\"button\" class=\"btn btn-mini btn-danger\"> </button></td></tr>"), Za = /* @__PURE__ */ Qi("<tr><td><!></td><td><div class=\"name\"> </div> <div class=\"meta\"> </div></td><td> </td><td><span class=\"row-progress-label\">-</span></td><td> </td><td><div class=\"row-progress\"><div class=\"row-progress-bar\"></div></div> <span class=\"row-progress-label\"> </span></td><td><button type=\"button\" class=\"btn btn-mini btn-primary\">↑</button> <button type=\"button\" class=\"btn btn-mini btn-primary\">↓</button> <button type=\"button\" class=\"btn btn-mini btn-danger\"> </button></td></tr>"), Qa = /* @__PURE__ */ Qi("<main class=\"uploader\"><header class=\"toolbar\"><button type=\"button\" class=\"btn btn-primary\"> </button> <button type=\"button\" class=\"btn btn-success\"> </button> <button type=\"button\" class=\"btn btn-warning\"> </button> <button type=\"button\" class=\"btn btn-danger\"> </button> <input type=\"file\" hidden=\"\"/></header> <section> </section> <section class=\"global-progress-wrap\"><div class=\"global-progress\" role=\"progressbar\" aria-valuemin=\"0\" aria-valuemax=\"100\"><div class=\"global-progress-bar\"></div></div> <span> </span></section> <section class=\"table-wrap\"><table class=\"file-table\"><thead><tr><th> </th><th> </th><th> </th><th> </th><th> </th><th> </th><th> </th></tr></thead><tbody><!><!><!></tbody></table></section></main>");
+var qa = /* @__PURE__ */ Qi("<tr><td colspan=\"7\" class=\"empty\"> </td></tr>"), Ja = /* @__PURE__ */ Qi("<img class=\"thumb\"/>"), Ya = /* @__PURE__ */ Qi("<div class=\"thumb thumb-placeholder\">FILE</div>"), Xa = /* @__PURE__ */ Qi("<tr><td><!></td><td><div class=\"name\"> </div> <div class=\"meta\"> </div></td><td> </td><td><input type=\"text\"/></td><td> </td><td><span class=\"row-progress-label\">100%</span></td><td><button type=\"button\" class=\"btn btn-mini btn-primary\">↑</button> <button type=\"button\" class=\"btn btn-mini btn-primary\">↓</button> <button type=\"button\" class=\"btn btn-mini btn-danger\"> </button></td></tr>"), Za = /* @__PURE__ */ Qi("<tr><td><!></td><td><div class=\"name\"> </div> <div class=\"meta\"> </div></td><td> </td><td><span class=\"row-progress-label\">-</span></td><td> </td><td><div class=\"row-progress\"><div class=\"row-progress-bar\"></div></div> <span class=\"row-progress-label\"> </span></td><td><button type=\"button\" class=\"btn btn-mini btn-primary\">↑</button> <button type=\"button\" class=\"btn btn-mini btn-primary\">↓</button> <button type=\"button\" class=\"btn btn-mini btn-danger\"> </button></td></tr>"), Qa = /* @__PURE__ */ Qi("<main class=\"uploader\"><header class=\"toolbar\"><button type=\"button\" class=\"btn btn-primary\"> </button> <button type=\"button\" class=\"btn btn-success\"> </button> <button type=\"button\" class=\"btn btn-warning\"> </button> <input type=\"file\" hidden=\"\"/></header> <section> </section> <section class=\"global-progress-wrap\"><div class=\"global-progress\" role=\"progressbar\" aria-valuemin=\"0\" aria-valuemax=\"100\"><div class=\"global-progress-bar\"></div></div> <span> </span></section> <section class=\"table-wrap\"><table class=\"file-table\"><thead><tr><th> </th><th> </th><th> </th><th> </th><th> </th><th> </th><th> </th></tr></thead><tbody><!><!><!></tbody></table></section></main>");
 function $a(e, t) {
 	xn(t, !0);
 	let n = Ba(t, "core", 7), r = /* @__PURE__ */ Tr(jr({
@@ -4898,15 +4864,12 @@ function $a(e, t) {
 	function l() {
 		n().cancelAll();
 	}
-	async function u() {
-		await n().clearCompleted();
-	}
-	function d(e) {
+	function u(e) {
 		e.preventDefault(), z(a, !1);
 		let t = [...e.dataTransfer?.files || []];
 		t.length > 0 && n().addFiles(t);
 	}
-	async function f(e, t) {
+	async function d(e, t) {
 		let r = X(o);
 		z(o, {
 			...X(o),
@@ -4921,75 +4884,73 @@ function $a(e, t) {
 			}, !0);
 		}
 	}
-	async function p(e) {
+	async function f(e) {
 		try {
 			await n().removeRemoteById(e);
 		} catch {}
 	}
-	async function m(e) {
+	async function p(e) {
 		try {
 			await n().removeLocalById(e);
 		} catch {}
 	}
-	var h = {
+	var m = {
 		get core() {
 			return n();
 		},
 		set core(e) {
 			n(e), Jn();
 		}
-	}, g = Qa(), _ = B(g), v = B(_), y = B(v, !0);
-	P(v);
-	var b = V(v, 2), x = B(b, !0);
-	P(b);
-	var S = V(b, 2), C = B(S, !0);
-	P(S);
-	var w = V(S, 2), ee = B(w, !0);
+	}, h = Qa(), g = B(h), _ = B(g), v = B(_, !0);
+	P(_);
+	var y = V(_, 2), b = B(y, !0);
+	P(y);
+	var x = V(y, 2), S = B(x, !0);
+	P(x);
+	var C = V(x, 2);
+	za(C, (e) => i = e, () => i), P(g);
+	var w = V(g, 2);
+	let ee;
+	var te = B(w, !0);
 	P(w);
-	var te = V(w, 2);
-	za(te, (e) => i = e, () => i), P(_);
-	var T = V(_, 2);
-	let ne;
-	var re = B(T, !0);
-	P(T);
-	var E = V(T, 2), ie = B(E), ae = B(ie);
-	P(ie);
-	var oe = V(ie, 2), se = B(oe);
-	P(oe), P(E);
-	var ce = V(E, 2), le = B(ce), ue = B(le), de = B(ue), fe = B(de), pe = B(fe, !0);
-	P(fe);
-	var me = V(fe), he = B(me, !0);
-	P(me);
-	var ge = V(me), D = B(ge, !0);
-	P(ge);
-	var _e = V(ge), ve = B(_e, !0);
-	P(_e);
-	var ye = V(_e), be = B(ye, !0);
-	P(ye);
-	var xe = V(ye), Se = B(xe, !0);
-	P(xe);
-	var Ce = V(xe), we = B(Ce, !0);
-	P(Ce), P(de), P(ue);
-	var Te = V(ue), Ee = B(Te), De = (e) => {
+	var T = V(w, 2), E = B(T), ne = B(E);
+	P(E);
+	var re = V(E, 2), ie = B(re);
+	P(re), P(T);
+	var ae = V(T, 2), oe = B(ae), se = B(oe), ce = B(se), le = B(ce), ue = B(le, !0);
+	P(le);
+	var de = V(le), fe = B(de, !0);
+	P(de);
+	var pe = V(de), me = B(pe, !0);
+	P(pe);
+	var he = V(pe), ge = B(he, !0);
+	P(he);
+	var D = V(he), _e = B(D, !0);
+	P(D);
+	var ve = V(D), ye = B(ve, !0);
+	P(ve);
+	var be = V(ve), xe = B(be, !0);
+	P(be), P(ce), P(se);
+	var Se = V(se), Ce = B(Se), we = (e) => {
 		var t = qa(), r = B(t), i = B(r, !0);
 		P(r), P(t), ai((e) => Q(i, e), [() => n().t("empty")]), $i(e, t);
 	};
-	da(Ee, (e) => {
-		X(r).localFiles.length === 0 && X(r).remoteFiles.length === 0 && e(De);
+	da(Ce, (e) => {
+		X(r).localFiles.length === 0 && X(r).remoteFiles.length === 0 && e(we);
 	});
-	var Oe = V(Ee);
-	return ha(Oe, 19, () => X(r).remoteFiles, (e) => String(e.id), (e, t, i) => {
+	var Te = V(Ce);
+	return ha(Te, 19, () => X(r).remoteFiles, (e) => String(e.id), (e, t, i) => {
 		let a = /* @__PURE__ */ mr(() => typeof X(t).type == "string" && X(t).type.startsWith("image/"));
 		var s = Xa(), c = B(s), l = B(c), u = (e) => {
 			var r = Ja();
 			ai((e) => {
 				$(r, "src", X(t).url), $(r, "alt", e);
 			}, [() => n().t("previewAlt", { name: X(t).name || n().t("fallbackFileName") })]), $i(e, r);
-		}, d = (e) => {
+		}, p = (e) => {
 			$i(e, Ya());
 		};
 		da(l, (e) => {
-			X(a) && X(t).url ? e(u) : e(d, -1);
+			X(a) && X(t).url ? e(u) : e(p, -1);
 		}), P(c);
 		var m = V(c), h = B(m), g = B(h, !0);
 		P(h);
@@ -5003,9 +4964,9 @@ function $a(e, t) {
 		P(x);
 		var w = V(x), ee = B(w, !0);
 		P(w);
-		var te = V(w, 2), T = B(te), ne = V(T, 2), re = V(ne, 2), E = B(re, !0);
-		P(re), P(te), P(s), ai((e, t, n, a, o, s, c, l, u, d, f, p, m) => {
-			Q(g, e), Q(v, t), Q(b, n), C = Ea(S, 1, "caption-input", null, C, a), Pa(S, o), $(S, "placeholder", s), S.disabled = c, Q(ee, l), $(T, "title", u), $(T, "aria-label", d), T.disabled = X(i) === 0, $(ne, "title", f), $(ne, "aria-label", p), ne.disabled = X(i) === X(r).remoteFiles.length - 1, Q(E, m);
+		var te = V(w, 2), T = B(te), E = V(T, 2), ne = V(E, 2), re = B(ne, !0);
+		P(ne), P(te), P(s), ai((e, t, n, a, o, s, c, l, u, d, f, p, m) => {
+			Q(g, e), Q(v, t), Q(b, n), C = Ea(S, 1, "caption-input", null, C, a), Pa(S, o), $(S, "placeholder", s), S.disabled = c, Q(ee, l), $(T, "title", u), $(T, "aria-label", d), T.disabled = X(i) === 0, $(E, "title", f), $(E, "aria-label", p), E.disabled = X(i) === X(r).remoteFiles.length - 1, Q(re, m);
 		}, [
 			() => X(t).name || n().t("fallbackFileName"),
 			() => X(t).type || n().t("unknownType"),
@@ -5020,10 +4981,10 @@ function $a(e, t) {
 			() => n().t("moveDown"),
 			() => n().t("moveDown"),
 			() => n().t("remove")
-		]), Z("change", S, (e) => f(String(X(t).id), e.currentTarget.value)), Z("keydown", S, (e) => {
+		]), Z("change", S, (e) => d(String(X(t).id), e.currentTarget.value)), Z("keydown", S, (e) => {
 			e.key === "Enter" && (e.preventDefault(), e.currentTarget.blur()), e.key === "Escape" && (e.preventDefault(), e.currentTarget.value = String(X(t).caption || ""), e.currentTarget.blur());
-		}), Z("click", T, () => n().moveRemote(String(X(t).id), "up")), Z("click", ne, () => n().moveRemote(String(X(t).id), "down")), Z("click", re, () => p(String(X(t).id))), $i(e, s);
-	}), ha(V(Oe), 19, () => X(r).localFiles, (e) => e.id, (e, t, i) => {
+		}), Z("click", T, () => n().moveRemote(String(X(t).id), "up")), Z("click", E, () => n().moveRemote(String(X(t).id), "down")), Z("click", ne, () => f(String(X(t).id))), $i(e, s);
+	}), ha(V(Te), 19, () => X(r).localFiles, (e) => e.id, (e, t, i) => {
 		let a = /* @__PURE__ */ mr(() => Math.round(X(t).progress?.percentage || 0)), o = /* @__PURE__ */ mr(() => n().computeFileStatus(X(t))), s = /* @__PURE__ */ mr(() => n().getPreviewUrl(X(t)));
 		var c = Za(), l = B(c), u = B(l), d = (e) => {
 			var r = Ja();
@@ -5036,11 +4997,11 @@ function $a(e, t) {
 		da(u, (e) => {
 			X(s) ? e(d) : e(f, -1);
 		}), P(l);
-		var p = V(l), h = B(p), g = B(h, !0);
+		var m = V(l), h = B(m), g = B(h, !0);
 		P(h);
 		var _ = V(h, 2), v = B(_, !0);
-		P(_), P(p);
-		var y = V(p), b = B(y, !0);
+		P(_), P(m);
+		var y = V(m), b = B(y, !0);
 		P(y);
 		var x = V(y, 2), S = B(x, !0);
 		P(x);
@@ -5048,9 +5009,9 @@ function $a(e, t) {
 		P(w);
 		var te = V(w, 2), T = B(te);
 		P(te), P(C);
-		var ne = V(C), re = B(ne), E = V(re, 2), ie = V(E, 2), ae = B(ie, !0);
-		P(ie), P(ne), P(c), ai((e, n, s, c, l, u, d) => {
-			Q(g, X(t).name), Q(v, e), Q(b, n), Q(S, X(o)), Oa(ee, `width: ${X(a)}%`), Q(T, `${X(a) ?? ""}%`), $(re, "title", s), $(re, "aria-label", c), re.disabled = X(i) === 0, $(E, "title", l), $(E, "aria-label", u), E.disabled = X(i) === X(r).localFiles.length - 1, Q(ae, d);
+		var E = V(C), ne = B(E), re = V(ne, 2), ie = V(re, 2), ae = B(ie, !0);
+		P(ie), P(E), P(c), ai((e, n, s, c, l, u, d) => {
+			Q(g, X(t).name), Q(v, e), Q(b, n), Q(S, X(o)), Oa(ee, `width: ${X(a)}%`), Q(T, `${X(a) ?? ""}%`), $(ne, "title", s), $(ne, "aria-label", c), ne.disabled = X(i) === 0, $(re, "title", l), $(re, "aria-label", u), re.disabled = X(i) === X(r).localFiles.length - 1, Q(ae, d);
 		}, [
 			() => X(t).type || n().t("unknownType"),
 			() => at(X(t).size),
@@ -5059,14 +5020,13 @@ function $a(e, t) {
 			() => n().t("moveDown"),
 			() => n().t("moveDown"),
 			() => n().t("remove")
-		]), Z("click", re, () => n().moveLocal(X(t).id, "up")), Z("click", E, () => n().moveLocal(X(t).id, "down")), Z("click", ie, () => m(X(t).id)), $i(e, c);
-	}), P(Te), P(le), P(ce), P(g), ai((e, t, i, o, s, c, l, u, d, f, p, m, h, g) => {
-		Q(y, e), Q(x, t), Q(C, i), Q(ee, o), te.multiple = n().options.multiple, ne = Ea(T, 1, "drop-zone", null, ne, { "is-over": X(a) }), $(T, "aria-label", s), Q(re, c), $(E, "aria-label", l), $(ie, "aria-valuenow", X(r).progress), Oa(ae, `width: ${X(r).progress}%`), Q(se, `${X(r).progress ?? ""}%`), Q(pe, u), Q(he, d), Q(D, f), Q(ve, p), Q(be, m), Q(Se, h), Q(we, g);
+		]), Z("click", ne, () => n().moveLocal(X(t).id, "up")), Z("click", re, () => n().moveLocal(X(t).id, "down")), Z("click", ie, () => p(X(t).id)), $i(e, c);
+	}), P(Se), P(oe), P(ae), P(h), ai((e, t, i, o, s, c, l, u, d, f, p, m, h) => {
+		Q(v, e), Q(b, t), Q(S, i), C.multiple = n().options.multiple, ee = Ea(w, 1, "drop-zone", null, ee, { "is-over": X(a) }), $(w, "aria-label", o), Q(te, s), $(T, "aria-label", c), $(E, "aria-valuenow", X(r).progress), Oa(ne, `width: ${X(r).progress}%`), Q(ie, `${X(r).progress ?? ""}%`), Q(ue, l), Q(fe, u), Q(me, d), Q(ge, f), Q(_e, p), Q(ye, m), Q(xe, h);
 	}, [
 		() => n().t("addFiles"),
 		() => n().t("startUpload"),
 		() => n().t("cancel"),
-		() => n().t("clearCompleted"),
 		() => n().t("ariaDropzone"),
 		() => n().t("dropzone"),
 		() => n().t("ariaGlobalProgress"),
@@ -5077,11 +5037,11 @@ function $a(e, t) {
 		() => n().t("headerStatus"),
 		() => n().t("headerProgress"),
 		() => n().t("headerActions")
-	]), Z("click", v, () => i.click()), Z("click", b, c), Z("click", S, l), Z("click", w, u), Z("change", te, s), Wi("dragover", T, (e) => {
+	]), Z("click", _, () => i.click()), Z("click", y, c), Z("click", x, l), Z("change", C, s), Wi("dragover", w, (e) => {
 		e.preventDefault(), z(a, !0);
-	}), Wi("dragleave", T, () => {
+	}), Wi("dragleave", w, () => {
 		z(a, !1);
-	}), Wi("drop", T, d), $i(e, g), Sn(h);
+	}), Wi("drop", w, u), $i(e, h), Sn(m);
 }
 Gi([
 	"click",
@@ -5151,9 +5111,6 @@ var to = class {
 	}
 	cancelAll() {
 		this.core.cancelAll();
-	}
-	async clearCompleted() {
-		await this.core.clearCompleted();
 	}
 	async removeLocalById(e) {
 		await this.core.removeLocalById(e);

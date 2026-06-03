@@ -89,10 +89,6 @@ export class UploaderWidget {
     this.core.cancelAll()
   }
 
-  async clearCompleted() {
-    await this.core.clearCompleted()
-  }
-
   async removeLocalById(id) {
     await this.core.removeLocalById(id)
   }

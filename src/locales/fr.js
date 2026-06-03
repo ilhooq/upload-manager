@@ -9,7 +9,6 @@ export default {
     addFiles: "Ajouter des fichiers",
     startUpload: "Démarrer l'upload",
     cancel: "Annuler",
-    clearCompleted: "Supprimer les terminés",
 
     // Drop zone
     dropzone: 'Glissez-déposez vos fichiers ici ou utilisez « Ajouter des fichiers ».',

@@ -51,10 +51,6 @@
     core.cancelAll()
   }
 
-  async function onClearCompleted() {
-    await core.clearCompleted()
-  }
-
   function onDrop(event) {
     event.preventDefault()
     dropzoneOver = false
@@ -96,7 +92,6 @@
     <button type="button" class="btn btn-primary" onclick={() => fileInput.click()}>{core.t("addFiles")}</button>
     <button type="button" class="btn btn-success" onclick={onStart}>{core.t("startUpload")}</button>
     <button type="button" class="btn btn-warning" onclick={onCancel}>{core.t("cancel")}</button>
-    <button type="button" class="btn btn-danger" onclick={onClearCompleted}>{core.t("clearCompleted")}</button>
     <input bind:this={fileInput} type="file" multiple={core.options.multiple} hidden onchange={onBrowseFiles}>
   </header>
 

@@ -6,7 +6,6 @@ export default {
     addFiles: "Add files",
     startUpload: "Start upload",
     cancel: "Cancel",
-    clearCompleted: "Clear completed",
 
     // Drop zone
     dropzone: 'Drag and drop your files here or use "Add files".',

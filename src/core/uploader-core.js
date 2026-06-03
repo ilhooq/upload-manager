@@ -254,49 +254,6 @@ export class UploaderCore {
     this.notify()
   }
 
-  async clearCompleted() {
-    for (const file of this.uppy.getFiles()) {
-      if (file.progress?.uploadComplete) {
-        try {
-          await this.deleteRemoteFile(file)
-          this.emit("deleteSuccess", {
-            id: file.meta?.serverId || file.response?.body?.id || file.response?.body?.file?.id || file.id,
-            scope: "remote",
-            state: this.getState()
-          })
-        } catch (error) {
-          this.emit("deleteError", {
-            id: file.id,
-            scope: "remote",
-            error,
-            state: this.getState()
-          })
-        }
-
-        this.revokePreview(file.id)
-        this.uppy.removeFile(file.id)
-        this.emit("deleteSuccess", {
-          id: file.id,
-          scope: "local",
-          state: this.getState()
-        })
-        continue
-      }
-
-      if (file.error) {
-        this.revokePreview(file.id)
-        this.uppy.removeFile(file.id)
-        this.emit("deleteSuccess", {
-          id: file.id,
-          scope: "local",
-          state: this.getState()
-        })
-      }
-    }
-
-    this.notify()
-  }
-
   moveLocal(fileId, direction) {
     this.moveInOrder(this.localOrder, fileId, direction)
 
