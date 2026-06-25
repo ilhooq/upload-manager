@@ -288,8 +288,7 @@ Field name from the `fieldName` option. Response:
 ```json
 {
   "id": "photo.jpg",
-  "file": { "id": "photo.jpg", "name": "photo.jpg", "url": "uploads/photo.jpg", "...": "..." },
-  "files": [ /* same shape, for batch uploads */ ]
+  "file": { "id": "photo.jpg", "name": "photo.jpg", "url": "uploads/photo.jpg", "...": "..." }
 }
 ```
 

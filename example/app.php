@@ -346,15 +346,9 @@ if ($method === 'POST') {
     $meta = normalizeMetaForFiles($meta, getStorageFiles());
     writeMeta($meta);
 
-    $payloadFiles = array_map(
-        static fn(string $id): array => fileDataFromPath($id, $meta),
-        $savedFiles
-    );
-
     respond(201, [
         'id' => $savedFiles[0],
-        'file' => $payloadFiles[0],
-        'files' => $payloadFiles,
+        'file' => fileDataFromPath($savedFiles[0], $meta),
     ]);
 }
 
