@@ -25,7 +25,8 @@ export class UploaderWidget {
       onFileUpdateError: options.onFileUpdateError ?? options.callbacks?.onFileUpdateError,
       onReorder: options.onReorder ?? options.callbacks?.onReorder,
       onDeleteSuccess: options.onDeleteSuccess ?? options.callbacks?.onDeleteSuccess,
-      onDeleteError: options.onDeleteError ?? options.callbacks?.onDeleteError
+      onDeleteError: options.onDeleteError ?? options.callbacks?.onDeleteError,
+      onErrorAddFile: options.onErrorAddFile ?? options.callbacks?.onErrorAddFile
     }
 
     this.core = new UploaderCore(options)
@@ -45,17 +46,24 @@ export class UploaderWidget {
   }
 
   bindCoreEvents() {
-    this.unsubscribers = [
-      this.core.on("ready", (payload) => this.callCallback("onReady", payload)),
-      this.core.on("change", (payload) => this.callCallback("onChange", payload)),
-      this.core.on("uploadSuccess", (payload) => this.callCallback("onUploadSuccess", payload)),
-      this.core.on("uploadError", (payload) => this.callCallback("onUploadError", payload)),
-      this.core.on("fileUpdate", (payload) => this.callCallback("onFileUpdate", payload)),
-      this.core.on("fileUpdateError", (payload) => this.callCallback("onFileUpdateError", payload)),
-      this.core.on("reorder", (payload) => this.callCallback("onReorder", payload)),
-      this.core.on("deleteSuccess", (payload) => this.callCallback("onDeleteSuccess", payload)),
-      this.core.on("deleteError", (payload) => this.callCallback("onDeleteError", payload))
-    ]
+    const eventMap = {
+      ready: "onReady",
+      change: "onChange",
+      uploadSuccess: "onUploadSuccess",
+      uploadError: "onUploadError",
+      fileUpdate: "onFileUpdate",
+      fileUpdateError: "onFileUpdateError",
+      reorder: "onReorder",
+      deleteSuccess: "onDeleteSuccess",
+      deleteError: "onDeleteError",
+      errorAddFile: "onErrorAddFile"
+    }
+
+    this.unsubscribers = Object.entries(eventMap)
+      .filter(([, callbackName]) => typeof this.callbacks[callbackName] === "function")
+      .map(([eventName, callbackName]) =>
+        this.core.on(eventName, (payload) => this.callCallback(callbackName, payload))
+      )
   }
 
   callCallback(name, payload) {
