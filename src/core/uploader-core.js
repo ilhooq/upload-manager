@@ -59,6 +59,9 @@ export class UploaderCore {
     this.localOrder = []
     this.remoteOrder = []
     this.previewUrls = new Map()
+    // Serializes remote reorder persistence so rapid clicks can't interleave
+    // requests and leave the server with a stale ordering.
+    this.reorderQueue = Promise.resolve()
 
     this.listeners = new Set()
     this.eventListeners = new Map()
@@ -290,19 +293,39 @@ export class UploaderCore {
   }
 
   async moveRemote(fileId, direction) {
-    const previousOrder = [...this.remoteOrder]
     this.moveInOrder(this.remoteOrder, fileId, direction)
     this.notify()
 
-    if (this.options.persistOrder) {
+    if (!this.options.persistOrder) {
+      this.emit("reorder", {
+        scope: "remote",
+        id: fileId,
+        direction,
+        order: [...this.remoteOrder],
+        persisted: false,
+        state: this.getState()
+      })
+      return
+    }
+
+    // Snapshot the order to persist now; chain onto the queue so concurrent
+    // moves are sent one at a time, in the order they were triggered.
+    const orderToPersist = [...this.remoteOrder]
+    this.reorderQueue = this.reorderQueue.then(async () => {
       try {
-        const newOrder = this.remoteOrder.indexOf(String(fileId)) + 1
-        const response = await this.updateRemoteFile(String(fileId), { order: newOrder })
-        const updatedId = String(response?.file?.id || fileId)
-        await this.loadRemoteFiles()
-        fileId = updatedId
+        await this.persistRemoteOrder(orderToPersist)
+        this.emit("reorder", {
+          scope: "remote",
+          id: fileId,
+          direction,
+          order: [...this.remoteOrder],
+          persisted: true,
+          state: this.getState()
+        })
       } catch (error) {
-        this.remoteOrder = previousOrder
+        // Resync from the server: with full-order persistence, the truth is
+        // whatever the last successful write left, not this single snapshot.
+        await this.loadRemoteFiles()
         this.notify()
         this.emit("reorder", {
           scope: "remote",
@@ -313,20 +336,27 @@ export class UploaderCore {
           error,
           state: this.getState()
         })
-        return
       }
-    }
-
-    this.emit("reorder", {
-      scope: "remote",
-      id: fileId,
-      direction,
-      order: [...this.remoteOrder],
-      persisted: Boolean(this.options.persistOrder),
-      state: this.getState()
     })
 
-    this.notify()
+    return this.reorderQueue
+  }
+
+  async persistRemoteOrder(orderedIds) {
+    const response = await fetch(this.options.orderEndpoint, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ order: orderedIds })
+    })
+
+    if (!response.ok) {
+      const payload = await response.json().catch(() => ({}))
+      throw new Error(payload.error || this.t("errorOrder", { status: response.status }))
+    }
+
+    return response.json().catch(() => ({}))
   }
 
   async removeRemoteById(id) {

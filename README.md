@@ -59,9 +59,10 @@ import "@ilhooq/upload-manager/style.css"
   import { UploaderWidget } from "/dist/upload-manager.es.js"
 
   const widget = new UploaderWidget("#uploader", {
-    endpoint: "/api/files",        // POST  — upload
+    endpoint: "/api/files",        // POST  — upload (multipart)
     listEndpoint: "/api/files",    // GET   — list existing files
-    updateEndpoint: "/api/files",  // PATCH — update caption / order
+    updateEndpoint: "/api/files",  // PATCH — update caption
+    orderEndpoint: "/api/files",   // POST  — persist full ordering ({ order: [ids] })
     deleteEndpoint: "/api/files",  // DELETE?id=... — remove a file
     fieldName: "file",
     maxFileSize: 5 * 1024 * 1024,
@@ -73,7 +74,7 @@ import "@ilhooq/upload-manager/style.css"
 </script>
 ```
 
-All four endpoints may point to the same URL and dispatch by HTTP method (see the PHP reference in `example/app.php`).
+All endpoints may point to the same URL and dispatch by HTTP method (the upload and the ordering both use `POST`, distinguished by `Content-Type`: multipart for upload, `application/json` for ordering — see the PHP reference in `example/app.php`).
 
 ## Running the example
 
@@ -127,15 +128,15 @@ Construction immediately mounts the `<upload-manager>` element and calls `core.i
 | --- | --- | --- | --- |
 | `endpoint` | string | `"./app.php"` | URL for the `POST` upload request. |
 | `listEndpoint` | string | `"./app.php"` | URL for the `GET` listing of remote files. |
-| `updateEndpoint` | string | `"./app.php"` | URL for the `PATCH` update (caption / order). Falls back to `orderEndpoint` if not set. |
+| `updateEndpoint` | string | `"./app.php"` | URL for the `PATCH` update (caption). Falls back to `orderEndpoint` if not set. |
 | `deleteEndpoint` | string | `"./app.php"` | URL for the `DELETE` request (`?id=<id>`). |
-| `orderEndpoint` | string | `"./app.php"` | Legacy alias used as fallback for `updateEndpoint`. |
+| `orderEndpoint` | string | `"./app.php"` | URL for the `POST` ordering request (full ordered list of ids). |
 | `fieldName` | string | `"file"` | Multipart form field name for the uploaded file. |
 | `maxFileSize` | number | `5242880` (5 MB) | Maximum size per file, in bytes. |
 | `autoProceed` | boolean | `false` | Start uploading as soon as files are added. |
 | `multiple` | boolean | `true` | Allow more than one file (`false` limits to 1). |
 | `showRemoteFiles` | boolean | `true` | Fetch and display files already on the server. |
-| `persistOrder` | boolean | `true` | Persist remote reordering to the server via `PATCH`. |
+| `persistOrder` | boolean | `true` | Persist remote reordering to the server via `POST` to `orderEndpoint`. |
 | `locale` | string \| object | `"en"` | Locale key (`"en"`, `"fr"`), or a custom `{ strings, pluralize }` pack. |
 | `labels` | object | `{}` | Per-key string overrides applied on top of the chosen locale. |
 
@@ -162,8 +163,8 @@ Each callback receives a single object argument that always contains `widget` (t
 | `onChange` | — | Any state change (progress, add, remove, reorder…). |
 | `onUploadSuccess` | `file`, `response`, `serverId` | A file finished uploading. |
 | `onUploadError` | `file`, `error`, `response` | An upload failed. |
-| `onFileUpdate` | `id`, `changes`, `file` | A `PATCH` update (caption/order) succeeded. |
-| `onFileUpdateError` | `id`, `changes`, `error` | A `PATCH` update failed. |
+| `onFileUpdate` | `id`, `changes`, `file` | A `PATCH` caption update succeeded. |
+| `onFileUpdateError` | `id`, `changes`, `error` | A `PATCH` caption update failed. |
 | `onReorder` | `scope` (`"local"`/`"remote"`), `id`, `direction` (`"up"`/`"down"`), `order`, `persisted`, `error?` | A file was moved. |
 | `onDeleteSuccess` | `id`, `scope` | A file was removed. |
 | `onDeleteError` | `id`, `scope`, `error` | A removal failed. |
@@ -199,7 +200,7 @@ The core exposes two distinct notification channels:
 | `startUpload()` | Async. Upload pending files. |
 | `cancelAll()` | Cancel all uploads. |
 | `moveLocal(id, direction)` | Reorder a local file (`"up"` / `"down"`). |
-| `moveRemote(id, direction)` | Async. Reorder a remote file; persists via `PATCH` when `persistOrder` is on, rolling back on failure. |
+| `moveRemote(id, direction)` | Async. Reorder a remote file; persists the full ordering via `POST` to `orderEndpoint` when `persistOrder` is on. Calls are serialized; on failure the list is resynced from the server. |
 | `removeLocalById(id)` | Async. Remove a local file (and its server copy if uploaded). |
 | `removeRemoteById(id)` | Async. Delete a remote file. |
 | `saveRemoteCaption(id, caption)` | Async. Persist a caption via `PATCH` (no-op if unchanged). |
@@ -259,7 +260,7 @@ Plural strings are objects keyed by `pluralize(count)`; pass `count` in `vars` w
 
 ## Server contract
 
-You implement four endpoints (which may share one URL, dispatching by HTTP method). `example/app.php` is a complete reference implementation that persists ordering and captions in `example/uploads/.meta.json` and sanitizes/de-duplicates uploaded file names.
+You implement five endpoints (which may share one URL, dispatching by HTTP method — and, for the two `POST` routes, by `Content-Type`). `example/app.php` is a complete reference implementation that persists ordering and captions in `example/uploads/.meta.json` and sanitizes/de-duplicates uploaded file names.
 
 ### `GET listEndpoint` — list remote files
 
@@ -294,19 +295,29 @@ Field name from the `fieldName` option. Response:
 
 The server id extracted by the client is `response.body.id` or `response.body.file.id`.
 
-### `PATCH updateEndpoint` — update caption / order
+### `PATCH updateEndpoint` — update caption
 
 Request body:
 
 ```json
-{ "id": "photo.jpg", "changes": { "order": 2 } }
+{ "id": "photo.jpg", "changes": { "caption": "New caption" } }
 ```
 
-`order` is 1-based. Response:
+Response:
 
 ```json
 { "id": "photo.jpg", "file": { "...": "..." } }
 ```
+
+### `POST orderEndpoint` — persist ordering (`application/json`)
+
+Sent when `persistOrder` is on. The body carries the complete ordered list of ids (display order); the server rewrites each file's position accordingly. Ids missing from the list keep their relative order after the listed ones.
+
+```json
+{ "order": ["photo.jpg", "scan.png", "report.pdf"] }
+```
+
+Any 2xx response is accepted; returning the refreshed list (`{ "files": [...] }`) is optional, as the client already applied the move optimistically.
 
 ### `DELETE deleteEndpoint?id=<id>` — remove a file
 

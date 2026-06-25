@@ -47,6 +47,7 @@ export default {
     errorAddFile: "Impossible d'ajouter le fichier %{name}",
     errorDelete: "Suppression refusée (%{status})",
     errorUpdate: "Mise à jour du fichier refusée (%{status})",
+    errorOrder: "Réordonnancement refusé (%{status})",
     errorLoadRemote: "Chargement des fichiers serveur impossible"
   }
 }

@@ -294,6 +294,60 @@ if ($method === 'GET') {
 }
 
 if ($method === 'POST') {
+    // The front sends the full ordering as a JSON body { "order": [ids...] }.
+    // Distinguish it from a multipart file upload by the Content-Type.
+    $contentType = $_SERVER['CONTENT_TYPE'] ?? '';
+    if (str_contains($contentType, 'application/json')) {
+        $raw = file_get_contents('php://input') ?: '';
+        $json = json_decode($raw, true);
+
+        if (!is_array($json) || !isset($json['order']) || !is_array($json['order'])) {
+            respond(400, ['error' => 'Payload invalide: order doit être un tableau.']);
+        }
+
+        $meta = syncMetaWithDisk();
+
+        // Place the ids the front listed first, in the given order, ignoring
+        // unknown or duplicated entries.
+        $ordered = [];
+        foreach ($json['order'] as $rawId) {
+            if (!is_string($rawId)) {
+                continue;
+            }
+            $fileName = normalizeFileName($rawId);
+            if (isset($meta[$fileName]) && !in_array($fileName, $ordered, true)) {
+                $ordered[] = $fileName;
+            }
+        }
+
+        // Any file missing from the payload keeps its current relative position,
+        // appended after the listed ones.
+        foreach (array_keys($meta) as $fileName) {
+            if (!in_array($fileName, $ordered, true)) {
+                $ordered[] = $fileName;
+            }
+        }
+
+        $result = [];
+        foreach ($ordered as $index => $fileName) {
+            $record = $meta[$fileName];
+            $record['order'] = $index + 1;
+            $result[$fileName] = $record;
+        }
+
+        writeMeta($result);
+
+        $files = [];
+        foreach (array_keys($result) as $fileName) {
+            if (!is_file(TARGET_DIR . $fileName)) {
+                continue;
+            }
+            $files[] = fileDataFromPath($fileName, $result);
+        }
+
+        respond(200, ['files' => $files]);
+    }
+
     if (empty($_FILES)) {
         respond(400, ['error' => 'Aucun fichier transmis.']);
     }

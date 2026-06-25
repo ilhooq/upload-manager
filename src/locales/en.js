@@ -44,6 +44,7 @@ export default {
     errorAddFile: "Could not add file %{name}",
     errorDelete: "Deletion refused (%{status})",
     errorUpdate: "File update refused (%{status})",
+    errorOrder: "Reordering refused (%{status})",
     errorLoadRemote: "Could not load server files"
   }
 }
