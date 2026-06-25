@@ -428,7 +428,8 @@ export class UploaderCore {
   }
 
   async deleteRemoteById(id) {
-    const url = `${this.options.deleteEndpoint}?id=${encodeURIComponent(id)}`
+    const url = new URL(this.options.deleteEndpoint, window.location.href)
+    url.searchParams.set("id", id)
     const response = await fetch(url, { method: "DELETE" })
     if (!response.ok) {
       const payload = await response.json().catch(() => ({}))
