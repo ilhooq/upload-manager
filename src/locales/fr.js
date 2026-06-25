@@ -41,6 +41,12 @@ export default {
     // Actions
     moveUp: "Monter",
     moveDown: "Descendre",
-    remove: "Supprimer"
+    remove: "Supprimer",
+
+    // Errors
+    errorAddFile: "Impossible d'ajouter le fichier %{name}",
+    errorDelete: "Suppression refusée (%{status})",
+    errorUpdate: "Mise à jour du fichier refusée (%{status})",
+    errorLoadRemote: "Chargement des fichiers serveur impossible"
   }
 }

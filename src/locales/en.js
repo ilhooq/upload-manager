@@ -38,6 +38,12 @@ export default {
     // Actions
     moveUp: "Move up",
     moveDown: "Move down",
-    remove: "Remove"
+    remove: "Remove",
+
+    // Errors
+    errorAddFile: "Could not add file %{name}",
+    errorDelete: "Deletion refused (%{status})",
+    errorUpdate: "File update refused (%{status})",
+    errorLoadRemote: "Could not load server files"
   }
 }

@@ -248,7 +248,7 @@ export class UploaderCore {
           data: file
         })
       } catch (error) {
-        console.error("Impossible d'ajouter le fichier", file.name, error)
+        console.error(this.t("errorAddFile", { name: file.name }), error)
       }
     })
 
@@ -424,7 +424,7 @@ export class UploaderCore {
     const response = await fetch(url, { method: "DELETE" })
     if (!response.ok) {
       const payload = await response.json().catch(() => ({}))
-      throw new Error(payload.error || `Suppression refusee (${response.status})`)
+      throw new Error(payload.error || this.t("errorDelete", { status: response.status }))
     }
   }
 
@@ -439,7 +439,7 @@ export class UploaderCore {
 
     const payload = await response.json().catch(() => ({}))
     if (!response.ok) {
-      const error = new Error(payload.error || `Mise a jour fichier refusee (${response.status})`)
+      const error = new Error(payload.error || this.t("errorUpdate", { status: response.status }))
       this.emit("fileUpdateError", {
         id,
         changes,
@@ -488,7 +488,7 @@ export class UploaderCore {
         this.syncRemoteOrder()
       }
     } catch (error) {
-      console.error("Chargement des fichiers serveur impossible", error)
+      console.error(this.t("errorLoadRemote"), error)
     }
   }
 
