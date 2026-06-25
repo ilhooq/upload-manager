@@ -102,7 +102,7 @@ export class UploaderCore {
 
   emit(eventName, payload = {}) {
     const listeners = this.eventListeners.get(eventName)
-    if (!listeners) return
+    if (!listeners || listeners.size === 0) return false
 
     for (const listener of listeners) {
       try {
@@ -111,6 +111,7 @@ export class UploaderCore {
         console.error(`Event listener failed for ${eventName}`, error)
       }
     }
+    return true
   }
 
   subscribe(listener) {
@@ -248,7 +249,14 @@ export class UploaderCore {
           data: file
         })
       } catch (error) {
-        console.error(this.t("errorAddFile", { name: file.name }), error)
+        const handled = this.emit("errorAddFile", {
+          file,
+          error,
+          state: this.getState()
+        })
+        if (!handled) {
+          console.error(this.t("errorAddFile", { name: file.name }), error)
+        }
       }
     })
 
