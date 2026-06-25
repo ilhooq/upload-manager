@@ -168,6 +168,7 @@ Each callback receives a single object argument that always contains `widget` (t
 | `onReorder` | `scope` (`"local"`/`"remote"`), `id`, `direction` (`"up"`/`"down"`), `order`, `persisted`, `error?` | A file was moved. |
 | `onDeleteSuccess` | `id`, `scope` | A file was removed. |
 | `onDeleteError` | `id`, `scope`, `error` | A removal failed. |
+| `onErrorAddFile` | `file`, `error` | Adding a file to the queue failed (e.g. rejected by Uppy — size/type restriction). If no callback is registered, the core logs the error to the console instead. |
 
 ---
 
@@ -186,7 +187,7 @@ await core.init()
 The core exposes two distinct notification channels:
 
 - **`subscribe(listener)`** — calls `listener(state)` immediately and on **every** state change. Returns an unsubscribe function. Use it to render the full UI.
-- **`on(eventName, listener)`** — subscribes to a named domain event. Returns an unsubscribe function. Events: `ready`, `change`, `uploadSuccess`, `uploadError`, `fileUpdate`, `fileUpdateError`, `reorder`, `deleteSuccess`, `deleteError`. (`UploaderWidget` bridges these to the `on*` callbacks above.)
+- **`on(eventName, listener)`** — subscribes to a named domain event. Returns an unsubscribe function. Events: `ready`, `change`, `uploadSuccess`, `uploadError`, `fileUpdate`, `fileUpdateError`, `reorder`, `deleteSuccess`, `deleteError`, `errorAddFile`. (`UploaderWidget` bridges these to the `on*` callbacks above.) `on(event, listener)` and `emit(event, payload)` return early when there is no subscriber; `emit` returns `true` when at least one listener ran, `false` otherwise — the core uses this to fall back to `console.error` for `errorAddFile` when the host registered no handler.
 
 #### Methods
 

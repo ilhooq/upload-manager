@@ -470,17 +470,7 @@ if ($method === 'PATCH') {
 if ($method === 'DELETE') {
     $id = $_GET['id'] ?? '';
 
-    if ($id === '') {
-        $raw = file_get_contents('php://input') ?: '';
-        if ($raw !== '') {
-            $json = json_decode($raw, true);
-            if (is_array($json) && isset($json['id']) && is_string($json['id'])) {
-                $id = $json['id'];
-            }
-        }
-    }
-
-    if (!is_string($id) || trim($id) === '') {
+    if (trim($id) === '') {
         respond(400, ['error' => 'Identifiant manquant.']);
     }
 

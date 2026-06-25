@@ -51,6 +51,9 @@
       },
       onDeleteError: ({ id, scope, error }) => {
         console.error("Delete error", scope, id, error)
+      },
+      onErrorAddFile: ({ file, error }) => {
+        console.error("Add file error", file?.name, error)
       }
     })
 
