@@ -273,6 +273,7 @@ You implement five endpoints (which may share one URL, dispatching by HTTP metho
       "name": "photo.jpg",
       "size": 12345,
       "type": "image/jpeg",
+      "thumbUrl": "thumbnail/photo-60x80.jpg",
       "url": "uploads/photo.jpg",
       "caption": "optional",
       "order": 1
@@ -281,7 +282,9 @@ You implement five endpoints (which may share one URL, dispatching by HTTP metho
 }
 ```
 
-Recognized fields: `id`, `name`, `size`, `type`, `url`, `caption?`, `order?` (1-based), plus any extra scalar fields (e.g. `thumbUrl`, `updatedAt`).
+Recognized fields: `id`, `name`, `size`, `type`, `url`, `caption?`, `order?` (1-based), `thumbUrl?`, plus any extra scalar fields (e.g. `updatedAt`).
+
+`thumbUrl` is the URL of a thumbnail image rendered in the file list. If it is omitted and the file is an image (`type` starts with `image/`), the full `url` is used as the thumbnail; otherwise a placeholder is shown.
 
 ### `POST endpoint` — upload (multipart)
 

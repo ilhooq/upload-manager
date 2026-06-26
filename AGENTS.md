@@ -32,7 +32,7 @@ When changing behavior, locate it by layer: state/network → core; rendering �
 **Local vs remote files are two independent ordered lists.** `localFiles` = files in Uppy (pending or just-uploaded in this session); `remoteFiles` = files fetched from `listEndpoint`. Each has its own order array. On `upload-success`, the file stays in Uppy's list — the matching remote entry (if any) is filtered out to avoid duplicate rows. Reordering remote files calls PATCH with `{ changes: { order } }` when `persistOrder` is true and rolls back on failure.
 
 **Server contract** (see `example/app.php` for the reference implementation; all four endpoints can point to the same URL and dispatch by HTTP method):
-- `GET listEndpoint` → `{ files: [{ id, name, size, type, url, caption?, order?, ... }] }`
+- `GET listEndpoint` → `{ files: [{ id, name, size, type, url, caption?, order?, thumbUrl?, ... }] }`. `thumbUrl` is the file-list thumbnail; if omitted, image files fall back to `url`, others render a placeholder.
 - `POST endpoint` (multipart, field name from `fieldName` option) → `{ id, file, files }`; the `serverId` extracted is `response.body.id` or `response.body.file.id`.
 - `PATCH updateEndpoint` body `{ id, changes: { order?, caption?, ... } }` → `{ id, file }`. `order` is 1-based.
 - `DELETE deleteEndpoint?id=<id>` → `{ deleted }`.
