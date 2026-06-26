@@ -2112,7 +2112,12 @@ var Je = {
 		statusWaiting: "En attente",
 		moveUp: "Monter",
 		moveDown: "Descendre",
-		remove: "Supprimer"
+		remove: "Supprimer",
+		errorAddFile: "Impossible d'ajouter le fichier %{name}",
+		errorDelete: "Suppression refusée (%{status})",
+		errorUpdate: "Mise à jour du fichier refusée (%{status})",
+		errorOrder: "Réordonnancement refusé (%{status})",
+		errorLoadRemote: "Chargement des fichiers serveur impossible"
 	}
 }, Ze = {
 	pluralize: (e) => e === 1 ? 0 : 1,
@@ -2142,7 +2147,12 @@ var Je = {
 		statusWaiting: "Waiting",
 		moveUp: "Move up",
 		moveDown: "Move down",
-		remove: "Remove"
+		remove: "Remove",
+		errorAddFile: "Could not add file %{name}",
+		errorDelete: "Deletion refused (%{status})",
+		errorUpdate: "File update refused (%{status})",
+		errorOrder: "Reordering refused (%{status})",
+		errorLoadRemote: "Could not load server files"
 	}
 }, Qe = {
 	fr: Xe,
@@ -2188,7 +2198,7 @@ var Je = {
 			...e
 		}, this.options.updateEndpoint = e.updateEndpoint ?? e.orderEndpoint ?? "./app.php";
 		let t = nt(this.options.locale, this.options.labels);
-		this.strings = t.strings, this.pluralize = t.pluralize, this.labels = this.strings, this.remoteFiles = [], this.localOrder = [], this.remoteOrder = [], this.previewUrls = /* @__PURE__ */ new Map(), this.listeners = /* @__PURE__ */ new Set(), this.eventListeners = /* @__PURE__ */ new Map(), this.uppy = new Ue({
+		this.strings = t.strings, this.pluralize = t.pluralize, this.labels = this.strings, this.remoteFiles = [], this.localOrder = [], this.remoteOrder = [], this.previewUrls = /* @__PURE__ */ new Map(), this.reorderQueue = Promise.resolve(), this.listeners = /* @__PURE__ */ new Set(), this.eventListeners = /* @__PURE__ */ new Map(), this.uppy = new Ue({
 			autoProceed: this.options.autoProceed,
 			allowMultipleUploadBatches: !0,
 			restrictions: {
@@ -2212,11 +2222,13 @@ var Je = {
 	}
 	emit(e, t = {}) {
 		let n = this.eventListeners.get(e);
-		if (n) for (let r of n) try {
+		if (!n || n.size === 0) return !1;
+		for (let r of n) try {
 			r(t);
 		} catch (t) {
 			console.error(`Event listener failed for ${e}`, t);
 		}
+		return !0;
 	}
 	subscribe(e) {
 		return this.listeners.add(e), e(this.getState()), () => {
@@ -2294,7 +2306,11 @@ var Je = {
 					data: e
 				});
 			} catch (t) {
-				console.error("Impossible d'ajouter le fichier", e.name, t);
+				this.emit("errorAddFile", {
+					file: e,
+					error: t,
+					state: this.getState()
+				}) || console.error(this.t("errorAddFile", { name: e.name }), t);
 			}
 		}), this.syncLocalOrder(), this.notify();
 	}
@@ -2315,30 +2331,52 @@ var Je = {
 		}), this.notify();
 	}
 	async moveRemote(e, t) {
-		let n = [...this.remoteOrder];
-		if (this.moveInOrder(this.remoteOrder, e, t), this.notify(), this.options.persistOrder) try {
-			let t = this.remoteOrder.indexOf(String(e)) + 1, n = await this.updateRemoteFile(String(e), { order: t }), r = String(n?.file?.id || e);
-			await this.loadRemoteFiles(), e = r;
-		} catch (r) {
-			this.remoteOrder = n, this.notify(), this.emit("reorder", {
+		if (this.moveInOrder(this.remoteOrder, e, t), this.notify(), !this.options.persistOrder) {
+			this.emit("reorder", {
 				scope: "remote",
 				id: e,
 				direction: t,
 				order: [...this.remoteOrder],
 				persisted: !1,
-				error: r,
 				state: this.getState()
 			});
 			return;
 		}
-		this.emit("reorder", {
-			scope: "remote",
-			id: e,
-			direction: t,
-			order: [...this.remoteOrder],
-			persisted: !!this.options.persistOrder,
-			state: this.getState()
-		}), this.notify();
+		let n = [...this.remoteOrder];
+		return this.reorderQueue = this.reorderQueue.then(async () => {
+			try {
+				await this.persistRemoteOrder(n), this.emit("reorder", {
+					scope: "remote",
+					id: e,
+					direction: t,
+					order: [...this.remoteOrder],
+					persisted: !0,
+					state: this.getState()
+				});
+			} catch (n) {
+				await this.loadRemoteFiles(), this.notify(), this.emit("reorder", {
+					scope: "remote",
+					id: e,
+					direction: t,
+					order: [...this.remoteOrder],
+					persisted: !1,
+					error: n,
+					state: this.getState()
+				});
+			}
+		}), this.reorderQueue;
+	}
+	async persistRemoteOrder(e) {
+		let t = await fetch(this.options.orderEndpoint, {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({ order: e })
+		});
+		if (!t.ok) {
+			let e = await t.json().catch(() => ({}));
+			throw Error(e.error || this.t("errorOrder", { status: t.status }));
+		}
+		return t.json().catch(() => ({}));
 	}
 	async removeRemoteById(e) {
 		try {
@@ -2413,10 +2451,12 @@ var Je = {
 		t && await this.deleteRemoteById(t);
 	}
 	async deleteRemoteById(e) {
-		let t = `${this.options.deleteEndpoint}?id=${encodeURIComponent(e)}`, n = await fetch(t, { method: "DELETE" });
+		let t = new URL(this.options.deleteEndpoint, window.location.href);
+		t.searchParams.set("id", e);
+		let n = await fetch(t, { method: "DELETE" });
 		if (!n.ok) {
 			let e = await n.json().catch(() => ({}));
-			throw Error(e.error || `Suppression refusee (${n.status})`);
+			throw Error(e.error || this.t("errorDelete", { status: n.status }));
 		}
 	}
 	async updateRemoteFile(e, t) {
@@ -2429,7 +2469,7 @@ var Je = {
 			})
 		}), r = await n.json().catch(() => ({}));
 		if (!n.ok) {
-			let i = Error(r.error || `Mise a jour fichier refusee (${n.status})`);
+			let i = Error(r.error || this.t("errorUpdate", { status: n.status }));
 			throw this.emit("fileUpdateError", {
 				id: e,
 				changes: t,
@@ -2463,7 +2503,7 @@ var Je = {
 			let t = await e.json().catch(() => ({}));
 			Array.isArray(t.files) && (this.remoteFiles = t.files, this.syncRemoteOrder());
 		} catch (e) {
-			console.error("Chargement des fichiers serveur impossible", e);
+			console.error(this.t("errorLoadRemote"), e);
 		}
 	}
 	async reload() {
@@ -5104,7 +5144,8 @@ var lo = class {
 			onFileUpdateError: t.onFileUpdateError ?? t.callbacks?.onFileUpdateError,
 			onReorder: t.onReorder ?? t.callbacks?.onReorder,
 			onDeleteSuccess: t.onDeleteSuccess ?? t.callbacks?.onDeleteSuccess,
-			onDeleteError: t.onDeleteError ?? t.callbacks?.onDeleteError
+			onDeleteError: t.onDeleteError ?? t.callbacks?.onDeleteError,
+			onErrorAddFile: t.onErrorAddFile ?? t.callbacks?.onErrorAddFile
 		}, this.core = new it(t), this.bindCoreEvents(), this.mountUi(), this.core.init().catch((e) => {
 			console.error("Initialisation du widget impossible", e);
 		});
@@ -5113,17 +5154,19 @@ var lo = class {
 		this.root.innerHTML = "", this.element = document.createElement(co), this.element.core = this.core, this.root.appendChild(this.element);
 	}
 	bindCoreEvents() {
-		this.unsubscribers = [
-			this.core.on("ready", (e) => this.callCallback("onReady", e)),
-			this.core.on("change", (e) => this.callCallback("onChange", e)),
-			this.core.on("uploadSuccess", (e) => this.callCallback("onUploadSuccess", e)),
-			this.core.on("uploadError", (e) => this.callCallback("onUploadError", e)),
-			this.core.on("fileUpdate", (e) => this.callCallback("onFileUpdate", e)),
-			this.core.on("fileUpdateError", (e) => this.callCallback("onFileUpdateError", e)),
-			this.core.on("reorder", (e) => this.callCallback("onReorder", e)),
-			this.core.on("deleteSuccess", (e) => this.callCallback("onDeleteSuccess", e)),
-			this.core.on("deleteError", (e) => this.callCallback("onDeleteError", e))
-		];
+		let e = {
+			ready: "onReady",
+			change: "onChange",
+			uploadSuccess: "onUploadSuccess",
+			uploadError: "onUploadError",
+			fileUpdate: "onFileUpdate",
+			fileUpdateError: "onFileUpdateError",
+			reorder: "onReorder",
+			deleteSuccess: "onDeleteSuccess",
+			deleteError: "onDeleteError",
+			errorAddFile: "onErrorAddFile"
+		};
+		this.unsubscribers = Object.entries(e).filter(([, e]) => typeof this.callbacks[e] == "function").map(([e, t]) => this.core.on(e, (e) => this.callCallback(t, e)));
 	}
 	callCallback(e, t) {
 		let n = this.callbacks[e];
